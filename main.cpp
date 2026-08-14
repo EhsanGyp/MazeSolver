@@ -12,6 +12,9 @@ int main()
 {
     /*end point existing flag*/
     bool found = false;
+
+    const int ROWS = 5;
+    const int COLS = 5;
     
     /* initializing start & end */
     int startRow = -1;
@@ -20,7 +23,7 @@ int main()
     int endCol = -1;
 
     /*hardcoding maze*/
-    char maze[5][5] = 
+    char maze[ROWS][COLS] = 
     {
         {'S','.','#','.','.'},
         {'#','.','#','.','#'},
@@ -30,15 +33,15 @@ int main()
     };
 
     /*making visited flag*/
-    bool visited[5][5] = {}; 
+    bool visited[ROWS][COLS] = {}; 
 
     /*parent array for reconstructing path*/
-    Position parent[5][5];
+    Position parent[ROWS][COLS];
 
     /*finding start & end rows & cols*/
-    for(int i = 0; i < 5; i++)
+    for(int i = 0; i < ROWS; i++)
     {
-        for(int j = 0; j < 5; j++)
+        for(int j = 0; j < COLS; j++)
         {
             if(maze[i][j] == 'S')
             {
@@ -54,7 +57,7 @@ int main()
     }
     
     /*creating simple stack*/
-    Position stack[25];
+    Position stack[ROWS * COLS];
     int top = -1;
 
     /*making start as whole position struct*/
@@ -93,8 +96,8 @@ int main()
             int newCol = current.Col + dc[i];
         
             /*validating new position*/
-            if(newRow >= 0 && newRow < 5 &&
-               newCol >= 0 && newCol < 5 &&
+            if(newRow >= 0 && newRow < ROWS &&
+               newCol >= 0 && newCol < COLS &&
                maze[newRow][newCol] != '#' &&
                !visited[newRow][newCol])
             {
@@ -136,9 +139,9 @@ int main()
         
         cout << "(" << startRow << ", " << startCol << ")" << endl;  
     
-        for(int i = 0; i < 5; i++)
+        for(int i = 0; i < ROWS; i++)
         {
-            for(int j = 0; j < 5; j++)
+            for(int j = 0; j < COLS; j++)
             {
                 cout << maze[i][j] << " ";
             }
