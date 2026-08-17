@@ -2,6 +2,8 @@
 #include <vector>
 using namespace std;
 
+
+
 /*creating position struct with row and cols*/
 struct Position
 {
@@ -72,6 +74,11 @@ int main()
     Position start;
     start.Row = startRow;
     start.Col = startCol;
+
+	/*making end as whole position struct*/
+	Position end;
+	end.Row = endRow;
+	end.Col = endCol;
 
     /*pushing start position into stack*/
     stack.push_back(start); 
