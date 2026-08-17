@@ -1,7 +1,8 @@
 #include <iostream>
+#include <vector>
 using namespace std;
 
-/*creating position stack with rows and cols*/
+/*creating position struct with row and cols*/
 struct Position
 {
     int Row;
@@ -13,30 +14,38 @@ int main()
     /*end point existing flag*/
     bool found = false;
 
-    const int ROWS = 5;
-    const int COLS = 5;
+    /*Rows and Cols decleration*/
+    int ROWS;
+    int COLS;
     
+    /*getting rows and cols as input from the user*/
+    cout << "Enter number of rows: ";
+    cin >> ROWS;
+
+    cout << "Enter number of columns: ";
+    cin >> COLS;
+
+    /*dynamic maze*/
+    vector<vector<char>> maze(ROWS, vector<char>(COLS));
+    for(int i = 0; i < ROWS; i++)
+    {
+        for(int j = 0; j < COLS; j++)
+        {
+            cin >> maze[i][j];
+        }
+    }
+
     /* initializing start & end */
     int startRow = -1;
     int startCol = -1;
     int endRow = -1;
     int endCol = -1;
 
-    /*hardcoding maze*/
-    char maze[ROWS][COLS] = 
-    {
-        {'S','.','#','.','.'},
-        {'#','.','#','.','#'},
-        {'.','.','.','.','#'},
-        {'.','#','#','.','.'},
-        {'.','.','.','.','E'}
-    };
-
     /*making visited flag*/
-    bool visited[ROWS][COLS] = {}; 
+    vector<vector<bool>> visited(ROWS, vector<bool>(COLS, false)); 
 
     /*parent array for reconstructing path*/
-    Position parent[ROWS][COLS];
+    vector<vector<Position>> parent(ROWS, vector<Position>(COLS));
 
     /*finding start & end rows & cols*/
     for(int i = 0; i < ROWS; i++)
@@ -57,8 +66,7 @@ int main()
     }
     
     /*creating simple stack*/
-    Position stack[ROWS * COLS];
-    int top = -1;
+    vector<Position> stack;
 
     /*making start as whole position struct*/
     Position start;
@@ -66,9 +74,8 @@ int main()
     start.Col = startCol;
 
     /*pushing start position into stack*/
-    top++;
-    stack[top] = start;
-
+    stack.push_back(start); 
+	
     /*mark start point as visited*/
     visited[startRow][startCol] = true;
 
@@ -77,10 +84,10 @@ int main()
     int dc[4] = {0, 0, -1, 1};  /*left & right*/
     
     /*main DFS logic*/
-    while(top != -1)
+    while(!stack.empty())
     {
-        Position current = stack[top];
-        top--;
+        Position current = stack.back();
+		stack.pop_back();
 
         if(current.Row == endRow && current.Col == endCol)  /*end point found*/
         {
@@ -106,8 +113,7 @@ int main()
                 next.Col = newCol;
 
                 /*pushing new position into the stack*/
-                top++;
-                stack[top] = next;
+				stack.push_back(next);
 
                 /*mark next position as visited*/
                 visited[newRow][newCol] = true;
