@@ -22,7 +22,6 @@ bool solveMaze(vector<vector<char>> & maze, vector<vector<bool>> & visited, vect
 
         if(current.Row == end.Row && current.Col == end.Col)  /*end point found*/
         {
-            cout << "Exit found" << endl;
 			return true;
         }
 
@@ -56,8 +55,9 @@ bool solveMaze(vector<vector<char>> & maze, vector<vector<bool>> & visited, vect
 	return false;
 }
 
-int main()
+vector<vector<char>> mazeInput()
 {
+
     /*Rows and Cols decleration*/
     int ROWS;
     int COLS;
@@ -69,6 +69,13 @@ int main()
     cout << "Enter number of columns: ";
     cin >> COLS;
 
+	if(ROWS == 0 || COLS == 0)
+	{
+		cout << "Invalid input,cant accept 0 rows or cols" << endl;
+		return {};	
+
+	}
+
     /*dynamic maze*/
     vector<vector<char>> maze(ROWS, vector<char>(COLS));
     for(int i = 0; i < ROWS; i++)
@@ -78,70 +85,87 @@ int main()
             cin >> maze[i][j];
         }
     }
+	return maze;
+}
+
+int main()
+{
+	vector<vector<char>> maze = mazeInput();
+
+	if(maze.empty())
+	{
+		return 0;
+	}
 
     /* initializing start & end */
-    int startRow = -1;
-    int startCol = -1;
-    int endRow = -1;
-    int endCol = -1;
+    Position start;
+	start.Row = -1;
+	start.Col = -1;
+
+    Position end;
+	end.Row = -1;
+	end.Col = -1;
 
     /*making visited flag*/
-    vector<vector<bool>> visited(ROWS, vector<bool>(COLS, false)); 
+    vector<vector<bool>> visited(maze.size(), vector<bool>(maze[0].size(), false)); 
     /*parent array for reconstructing path*/
-    vector<vector<Position>> parent(ROWS, vector<Position>(COLS));
+    vector<vector<Position>> parent(maze.size(), vector<Position>(maze[0].size()));
 
     /*finding start & end rows & cols*/
-    for(int i = 0; i < ROWS; i++)
+    for(int i = 0; i < maze.size(); i++)
     {
-        for(int j = 0; j < COLS; j++)
+        for(int j = 0; j < maze[0].size(); j++)
         {
             if(maze[i][j] == 'S')
             {
-                startRow = i;
-                startCol = j;
+                start.Row = i;
+                start.Col = j;
             }
             if(maze[i][j] == 'E')
             {
-                endRow = i;
-                endCol = j;
+                end.Row = i;
+                end.Col = j;
             }
         }
     }
-        
+
+	if(start.Row == -1)
+	{
+		cout << "Start not found" << endl;
+		return 0;
+	}
+
+	if(end.Row == -1)
+	{
+		cout << "End not found" << endl;
+		return 0;
+	}
+	
     /*creating simple stack*/
     vector<Position> stack;
-
-    /*making start as whole position struct*/
-    Position start;
-    start.Row = startRow;
-    start.Col = startCol;
-
-	/*making end as whole position struct*/
-	Position end;
-	end.Row = endRow;
-	end.Col = endCol;
 
     /*pushing start position into stack*/
     stack.push_back(start); 
 	
     /*mark start point as visited*/
-    visited[startRow][startCol] = true;
+    visited[start.Row][start.Col] = true;
 
 	/*maze solver function call*/
 	bool found_result = solveMaze(maze,visited,parent,end,stack);
 
     if(found_result)
     {
+		cout << "Exit found" << endl;
         Position current;
-        current.Row = endRow;
-        current.Col = endCol;
+        current.Row = end.Row;
+        current.Col = end.Col;
 
-        while(!(current.Row == startRow && current.Col == startCol))
+        while(!(current.Row == start.Row && current.Col == start.Col))
         {
             cout << "(" << current.Row << ", " << current.Col << ")" << endl;
 
             /*mark path in maze*/
-            if(!(current.Row == endRow && current.Col == endCol))
+            if(!(current.Row == end.Row && current.Col == end.Col))
             {
                 maze[current.Row][current.Col] = '*';
             }
@@ -149,11 +173,11 @@ int main()
             current = parent[current.Row][current.Col];
         }
         
-        cout << "(" << startRow << ", " << startCol << ")" << endl;  
+        cout << "(" << start.Row << ", " << start.Col << ")" << endl;  
     
-        for(int i = 0; i < ROWS; i++)
+        for(int i = 0; i < maze.size(); i++)
         {
-            for(int j = 0; j < COLS; j++)
+            for(int j = 0; j < maze[0].size(); j++)
             {
                 cout << maze[i][j] << " ";
             }
