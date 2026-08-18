@@ -2,8 +2,6 @@
 #include <vector>
 using namespace std;
 
-
-
 /*creating position struct with row and cols*/
 struct Position
 {
@@ -11,11 +9,55 @@ struct Position
     int Col;
 };
 
+bool solveMaze(vector<vector<char>> & maze, vector<vector<bool>> & visited, vector<vector<Position>> & parent, Position end, vector<Position> & stack)
+{
+	/*defining directions*/
+	int dr[4] = {-1, 1, 0, 0};  /*up & down*/
+	int dc[4] = {0, 0, -1, 1};  /*left & right*/
+
+	while(!stack.empty())
+    {
+        Position current = stack.back();
+		stack.pop_back();
+
+        if(current.Row == end.Row && current.Col == end.Col)  /*end point found*/
+        {
+            cout << "Exit found" << endl;
+			return true;
+        }
+
+        /*exploring directions*/
+        for(int i = 0; i < 4; i++)
+        {
+            int newRow = current.Row + dr[i];
+            int newCol = current.Col + dc[i];
+        
+            /*validating new position*/
+            if(newRow >= 0 && newRow < maze.size() &&
+               newCol >= 0 && newCol < maze[0].size() &&
+               maze[newRow][newCol] != '#' &&
+               !visited[newRow][newCol])
+            {
+                Position next;
+                next.Row = newRow;
+                next.Col = newCol;
+
+                /*pushing new position into the stack*/
+				stack.push_back(next);
+
+                /*mark next position as visited*/
+                visited[newRow][newCol] = true;
+
+                /*having track of parent point*/
+                parent[next.Row][next.Col] = current;
+            }
+        }  
+    }
+	return false;
+}
+
 int main()
 {
-    /*end point existing flag*/
-    bool found = false;
-
     /*Rows and Cols decleration*/
     int ROWS;
     int COLS;
@@ -45,7 +87,6 @@ int main()
 
     /*making visited flag*/
     vector<vector<bool>> visited(ROWS, vector<bool>(COLS, false)); 
-
     /*parent array for reconstructing path*/
     vector<vector<Position>> parent(ROWS, vector<Position>(COLS));
 
@@ -66,7 +107,7 @@ int main()
             }
         }
     }
-    
+        
     /*creating simple stack*/
     vector<Position> stack;
 
@@ -86,52 +127,10 @@ int main()
     /*mark start point as visited*/
     visited[startRow][startCol] = true;
 
-    /*defining directions*/
-    int dr[4] = {-1, 1, 0, 0};  /*up & down*/
-    int dc[4] = {0, 0, -1, 1};  /*left & right*/
-    
-    /*main DFS logic*/
-    while(!stack.empty())
-    {
-        Position current = stack.back();
-		stack.pop_back();
+	/*maze solver function call*/
+	bool found_result = solveMaze(maze,visited,parent,end,stack);
 
-        if(current.Row == endRow && current.Col == endCol)  /*end point found*/
-        {
-            cout << "Exit found" << endl;
-            found = true;
-            break;
-        }
-
-        /*exploring directions*/
-        for(int i = 0; i < 4; i++)
-        {
-            int newRow = current.Row + dr[i];
-            int newCol = current.Col + dc[i];
-        
-            /*validating new position*/
-            if(newRow >= 0 && newRow < ROWS &&
-               newCol >= 0 && newCol < COLS &&
-               maze[newRow][newCol] != '#' &&
-               !visited[newRow][newCol])
-            {
-                Position next;
-                next.Row = newRow;
-                next.Col = newCol;
-
-                /*pushing new position into the stack*/
-				stack.push_back(next);
-
-                /*mark next position as visited*/
-                visited[newRow][newCol] = true;
-
-                /*having track of parent point*/
-                parent[next.Row][next.Col] = current;
-            }
-        }  
-    }
-    
-    if(found)
+    if(found_result)
     {
         Position current;
         current.Row = endRow;
