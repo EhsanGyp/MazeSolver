@@ -9,11 +9,15 @@ struct Position
     int Col;
 };
 
-bool solveMaze(vector<vector<char>> & maze, vector<vector<bool>> & visited, vector<vector<Position>> & parent, Position end, vector<Position> & stack)
+bool solveMaze(const vector<vector<char>> & maze, vector<vector<bool>> & visited, vector<vector<Position>> & parent,Position start, Position end)
 {
 	/*defining directions*/
 	int dr[4] = {-1, 1, 0, 0};  /*up & down*/
 	int dc[4] = {0, 0, -1, 1};  /*left & right*/
+
+	vector<Position> stack;
+	stack.push_back(start);
+	visited[start.Row][start.Col] = true;
 
 	while(!stack.empty())
     {
@@ -88,30 +92,38 @@ vector<vector<char>> mazeInput()
 	return maze;
 }
 
-int main()
+void reconstructPath(vector<vector<char>> &maze, Position start, Position end, vector<vector<Position>> & parent)
 {
-	vector<vector<char>> maze = mazeInput();
+	cout << "Exit found" << endl;
+	Position current = end;
 
-	if(maze.empty())
+	while(!(current.Row == start.Row && current.Col == start.Col))
 	{
-		return 0;
+		cout << "(" << current.Row << ", " << current.Col << ")" << endl;
+
+		/*mark path in maze*/
+		if(!(current.Row == end.Row && current.Col == end.Col))
+		{
+			maze[current.Row][current.Col] = '*';
+		}
+
+		current = parent[current.Row][current.Col];
 	}
+	
+	cout << "(" << start.Row << ", " << start.Col << ")" << endl;  
 
-    /* initializing start & end */
-    Position start;
-	start.Row = -1;
-	start.Col = -1;
+	for(int i = 0; i < maze.size(); i++)
+	{
+		for(int j = 0; j < maze[0].size(); j++)
+		{
+			cout << maze[i][j] << " ";
+		}
+		cout << endl;
+	}
+}
 
-    Position end;
-	end.Row = -1;
-	end.Col = -1;
-
-    /*making visited flag*/
-    vector<vector<bool>> visited(maze.size(), vector<bool>(maze[0].size(), false)); 
-    /*parent array for reconstructing path*/
-    vector<vector<Position>> parent(maze.size(), vector<Position>(maze[0].size()));
-
-    /*finding start & end rows & cols*/
+void findStartEnd(vector<vector<char>> &maze, Position &start, Position &end)
+{
     for(int i = 0; i < maze.size(); i++)
     {
         for(int j = 0; j < maze[0].size(); j++)
@@ -128,6 +140,28 @@ int main()
             }
         }
     }
+}
+
+int main()
+{
+	vector<vector<char>> maze = mazeInput();
+
+	if(maze.empty())
+	{
+		return 0;
+	}
+
+    /* initializing start & end */
+    Position start = {-1, -1};
+    Position end = {-1, -1};
+
+    /*making visited flag*/
+    vector<vector<bool>> visited(maze.size(), vector<bool>(maze[0].size(), false)); 
+    /*parent array for reconstructing path*/
+    vector<vector<Position>> parent(maze.size(), vector<Position>(maze[0].size()));
+
+    /*finding start & end rows & cols*/
+	findStartEnd(maze, start, end);
 
 	if(start.Row == -1)
 	{
@@ -141,54 +175,13 @@ int main()
 		return 0;
 	}
 	
-    /*creating simple stack*/
-    vector<Position> stack;
-
-    /*pushing start position into stack*/
-    stack.push_back(start); 
-	
-    /*mark start point as visited*/
-    visited[start.Row][start.Col] = true;
-
 	/*maze solver function call*/
-	bool found_result = solveMaze(maze,visited,parent,end,stack);
+	bool found_result = solveMaze(maze, visited, parent, start, end);
 
     if(found_result)
-    {
-		cout << "Exit found" << endl;
-        Position current;
-        current.Row = end.Row;
-        current.Col = end.Col;
-
-        while(!(current.Row == start.Row && current.Col == start.Col))
-        {
-            cout << "(" << current.Row << ", " << current.Col << ")" << endl;
-
-            /*mark path in maze*/
-            if(!(current.Row == end.Row && current.Col == end.Col))
-            {
-                maze[current.Row][current.Col] = '*';
-            }
-
-            current = parent[current.Row][current.Col];
-        }
-        
-        cout << "(" << start.Row << ", " << start.Col << ")" << endl;  
-    
-        for(int i = 0; i < maze.size(); i++)
-        {
-            for(int j = 0; j < maze[0].size(); j++)
-            {
-                cout << maze[i][j] << " ";
-            }
-            cout << endl;
-        }
-        
-    }
+		reconstructPath(maze, start, end, parent);
     else
-    {
         cout << "No path found" << endl;
-    }
 
     return 0;
 }
